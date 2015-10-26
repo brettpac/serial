@@ -104,7 +104,9 @@ timespec_from_ms (const uint32_t millis)
   time.tv_nsec = (millis - (time.tv_sec * 1e3)) * 1e6;
   return time;
 }
-
+   /*
+    *****************************************************************************  
+    */
 Serial::SerialImpl::SerialImpl (const string &port, unsigned long baudrate,
                                 bytesize_t bytesize,
                                 parity_t parity, stopbits_t stopbits,
@@ -118,14 +120,18 @@ Serial::SerialImpl::SerialImpl (const string &port, unsigned long baudrate,
   if (port_.empty () == false)
     open ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 Serial::SerialImpl::~SerialImpl ()
 {
   close();
   pthread_mutex_destroy(&this->read_mutex);
   pthread_mutex_destroy(&this->write_mutex);
 }
-
+   /*
+    *****************************************************************************  
+    */
 void
 Serial::SerialImpl::open ()
 {
@@ -135,7 +141,9 @@ Serial::SerialImpl::open ()
   if (is_open_ == true) {
     throw SerialException ("Serial port already open.");
   }
-
+   /*
+    *****************************************************************************  
+    */
   fd_ = ::open (port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 
   if (fd_ == -1) {
@@ -155,9 +163,10 @@ Serial::SerialImpl::open ()
   reconfigurePort();
   is_open_ = true;
 }
-
-void
-Serial::SerialImpl::reconfigurePort ()
+   /*
+    *****************************************************************************  
+    */
+ void Serial::SerialImpl::reconfigurePort ()
 {
   if (fd_ == -1) {
     // Can only operate on a valid file descriptor
@@ -301,17 +310,9 @@ Serial::SerialImpl::reconfigurePort ()
 #endif
   default:
     custom_baud = true;
-    // OS X support
-#if defined(MAC_OS_X_VERSION_10_4) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4)
-    // Starting with Tiger, the IOSSIOSPEED ioctl can be used to set arbitrary baud rates
-    // other than those specified by POSIX. The driver for the underlying serial hardware
-    // ultimately determines which baud rates can be used. This ioctl sets both the input
-    // and output speed.
-    speed_t new_baud = static_cast<speed_t> (baudrate_);
-    if (-1 == ioctl (fd_, IOSSIOSPEED, &new_baud, 1)) {
-      THROW (IOException, errno);
-    }
-    // Linux Support
+    
+  
+  // Linux Support
 #elif defined(__linux__) && defined (TIOCSSERIAL)
     struct serial_struct ser;
 
@@ -341,7 +342,7 @@ Serial::SerialImpl::reconfigurePort ()
 #endif
   }
 
-  // setup char len
+  // Configure char Lengths
   options.c_cflag &= (tcflag_t) ~CSIZE;
   if (bytesize_ == eightbits)
     options.c_cflag |= CS8;
@@ -353,7 +354,8 @@ Serial::SerialImpl::reconfigurePort ()
     options.c_cflag |= CS5;
   else
     throw invalid_argument ("invalid char len");
-  // setup stopbits
+  
+  // Configure Stop Bits
   if (stopbits_ == stopbits_one)
     options.c_cflag &= (tcflag_t) ~(CSTOPB);
   else if (stopbits_ == stopbits_one_point_five)
@@ -363,7 +365,8 @@ Serial::SerialImpl::reconfigurePort ()
     options.c_cflag |=  (CSTOPB);
   else
     throw invalid_argument ("invalid stop bit");
-  // setup parity
+  
+  // Configure Parity
   options.c_iflag &= (tcflag_t) ~(INPCK | ISTRIP);
   if (parity_ == parity_none) {
     options.c_cflag &= (tcflag_t) ~(PARENB | PARODD);
@@ -390,8 +393,9 @@ Serial::SerialImpl::reconfigurePort ()
   else {
     throw invalid_argument ("invalid parity");
   }
-  // setup flow control
-  if (flowcontrol_ == flowcontrol_none) {
+ 
+ // Configure Flow Control
+ if (flowcontrol_ == flowcontrol_none) {
     xonxoff_ = false;
     rtscts_ = false;
   }
@@ -403,7 +407,7 @@ Serial::SerialImpl::reconfigurePort ()
     xonxoff_ = false;
     rtscts_ = true;
   }
-  // xonxoff
+  // XONXOFF
 #ifdef IXANY
   if (xonxoff_)
     options.c_iflag |=  (IXON | IXOFF); //|IXANY)
@@ -415,7 +419,7 @@ Serial::SerialImpl::reconfigurePort ()
   else
     options.c_iflag &= (tcflag_t) ~(IXON | IXOFF);
 #endif
-  // rtscts
+  // RTS/CTS
 #ifdef CRTSCTS
   if (rtscts_)
     options.c_cflag |=  (CRTSCTS);
@@ -450,9 +454,10 @@ Serial::SerialImpl::reconfigurePort ()
     byte_time_ns_ += ((1.5 - stopbits_one_point_five) * bit_time_ns);
   }
 }
-
-void
-Serial::SerialImpl::close ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::close ()
 {
   if (is_open_ == true) {
     if (fd_ != -1) {
@@ -467,13 +472,16 @@ Serial::SerialImpl::close ()
     is_open_ = false;
   }
 }
-
-bool
-Serial::SerialImpl::isOpen () const
+   /*
+    *****************************************************************************  
+    */
+bool Serial::SerialImpl::isOpen () const
 {
   return is_open_;
 }
-
+   /*
+    *****************************************************************************  
+    */
 size_t
 Serial::SerialImpl::available ()
 {
@@ -487,9 +495,10 @@ Serial::SerialImpl::available ()
       return static_cast<size_t> (count);
   }
 }
-
-bool
-Serial::SerialImpl::waitReadable (uint32_t timeout)
+   /*
+    *****************************************************************************  
+    */
+bool Serial::SerialImpl::waitReadable (uint32_t timeout)
 {
   // Setup a select call to block for serial data or a timeout
   fd_set readfds;
@@ -518,14 +527,17 @@ Serial::SerialImpl::waitReadable (uint32_t timeout)
   // Data available to read.
   return true;
 }
-
-void
-Serial::SerialImpl::waitByteTimes (size_t count)
+     /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::waitByteTimes (size_t count)
 {
   timespec wait_time = { 0, static_cast<long>(byte_time_ns_ * count)};
   pselect (0, NULL, NULL, NULL, &wait_time, NULL);
 }
-
+   /*
+    *****************************************************************************  
+    */
 size_t
 Serial::SerialImpl::read (uint8_t *buf, size_t size)
 {
@@ -602,7 +614,9 @@ Serial::SerialImpl::read (uint8_t *buf, size_t size)
   }
   return bytes_read;
 }
-
+   /*
+    *****************************************************************************  
+    */
 size_t
 Serial::SerialImpl::write (const uint8_t *data, size_t length)
 {
@@ -685,139 +699,165 @@ Serial::SerialImpl::write (const uint8_t *data, size_t length)
   }
   return bytes_written;
 }
-
-void
-Serial::SerialImpl::setPort (const string &port)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setPort (const string &port)
 {
   port_ = port;
 }
-
+   /*
+    *****************************************************************************  
+    */
 string
 Serial::SerialImpl::getPort () const
 {
   return port_;
 }
-
-void
-Serial::SerialImpl::setTimeout (serial::Timeout &timeout)
+    /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setTimeout (serial::Timeout &timeout)
 {
   timeout_ = timeout;
 }
-
+   /*
+    *****************************************************************************  
+    */
 serial::Timeout
 Serial::SerialImpl::getTimeout () const
 {
   return timeout_;
 }
-
-void
-Serial::SerialImpl::setBaudrate (unsigned long baudrate)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setBaudrate (unsigned long baudrate)
 {
-  baudrate_ = baudrate;
+	baudrate_ = baudrate;
   if (is_open_)
     reconfigurePort ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 unsigned long
 Serial::SerialImpl::getBaudrate () const
 {
   return baudrate_;
 }
-
-void
-Serial::SerialImpl::setBytesize (serial::bytesize_t bytesize)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setBytesize (serial::bytesize_t bytesize)
 {
   bytesize_ = bytesize;
   if (is_open_)
     reconfigurePort ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 serial::bytesize_t
 Serial::SerialImpl::getBytesize () const
 {
   return bytesize_;
 }
-
-void
-Serial::SerialImpl::setParity (serial::parity_t parity)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setParity (serial::parity_t parity)
 {
   parity_ = parity;
   if (is_open_)
     reconfigurePort ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 serial::parity_t
 Serial::SerialImpl::getParity () const
 {
   return parity_;
 }
-
-void
-Serial::SerialImpl::setStopbits (serial::stopbits_t stopbits)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setStopbits (serial::stopbits_t stopbits)
 {
   stopbits_ = stopbits;
   if (is_open_)
     reconfigurePort ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 serial::stopbits_t
 Serial::SerialImpl::getStopbits () const
 {
   return stopbits_;
 }
-
-void
-Serial::SerialImpl::setFlowcontrol (serial::flowcontrol_t flowcontrol)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setFlowcontrol (serial::flowcontrol_t flowcontrol)
 {
   flowcontrol_ = flowcontrol;
   if (is_open_)
     reconfigurePort ();
 }
-
+   /*
+    *****************************************************************************  
+    */
 serial::flowcontrol_t
 Serial::SerialImpl::getFlowcontrol () const
 {
   return flowcontrol_;
 }
-
-void
-Serial::SerialImpl::flush ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::flush ()
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::flush");
   }
   tcdrain (fd_);
 }
-
-void
-Serial::SerialImpl::flushInput ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::flushInput ()
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::flushInput");
   }
   tcflush (fd_, TCIFLUSH);
 }
-
-void
-Serial::SerialImpl::flushOutput ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::flushOutput ()
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::flushOutput");
   }
   tcflush (fd_, TCOFLUSH);
 }
-
-void
-Serial::SerialImpl::sendBreak (int duration)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::sendBreak (int duration)
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::sendBreak");
   }
   tcsendbreak (fd_, static_cast<int> (duration / 4));
 }
-
-void
-Serial::SerialImpl::setBreak (bool level)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setBreak (bool level)
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::setBreak");
@@ -839,9 +879,10 @@ Serial::SerialImpl::setBreak (bool level)
     }
   }
 }
-
-void
-Serial::SerialImpl::setRTS (bool level)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setRTS (bool level)
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::setRTS");
@@ -865,9 +906,10 @@ Serial::SerialImpl::setRTS (bool level)
     }
   }
 }
-
-void
-Serial::SerialImpl::setDTR (bool level)
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::setDTR (bool level)
 {
   if (is_open_ == false) {
     throw PortNotOpenedException ("Serial::setDTR");
@@ -891,7 +933,9 @@ Serial::SerialImpl::setDTR (bool level)
     }
   }
 }
-
+   /*
+    *****************************************************************************  
+    */
 bool
 Serial::SerialImpl::waitForChange ()
 {
@@ -934,7 +978,9 @@ while (is_open_ == true) {
   return true;
 #endif
 }
-
+   /*
+    *****************************************************************************  
+    */
 bool
 Serial::SerialImpl::getCTS ()
 {
@@ -955,7 +1001,9 @@ Serial::SerialImpl::getCTS ()
     return 0 != (status & TIOCM_CTS);
   }
 }
-
+   /*
+    *****************************************************************************  
+    */
 bool
 Serial::SerialImpl::getDSR ()
 {
@@ -976,7 +1024,9 @@ Serial::SerialImpl::getDSR ()
       return 0 != (status & TIOCM_DSR);
   }
 }
-
+   /*
+    *****************************************************************************  
+    */
 bool
 Serial::SerialImpl::getRI ()
 {
@@ -997,7 +1047,9 @@ Serial::SerialImpl::getRI ()
     return 0 != (status & TIOCM_RI);
   }
 }
-
+   /*
+    *****************************************************************************  
+    */
 bool
 Serial::SerialImpl::getCD ()
 {
@@ -1018,36 +1070,40 @@ Serial::SerialImpl::getCD ()
     return 0 != (status & TIOCM_CD);
   }
 }
-
-void
-Serial::SerialImpl::readLock ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::readLock ()
 {
   int result = pthread_mutex_lock(&this->read_mutex);
   if (result) {
     THROW (IOException, result);
   }
 }
-
-void
-Serial::SerialImpl::readUnlock ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::readUnlock ()
 {
   int result = pthread_mutex_unlock(&this->read_mutex);
   if (result) {
     THROW (IOException, result);
   }
 }
-
-void
-Serial::SerialImpl::writeLock ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::writeLock ()
 {
   int result = pthread_mutex_lock(&this->write_mutex);
   if (result) {
     THROW (IOException, result);
   }
 }
-
-void
-Serial::SerialImpl::writeUnlock ()
+   /*
+    *****************************************************************************  
+    */
+void Serial::SerialImpl::writeUnlock ()
 {
   int result = pthread_mutex_unlock(&this->write_mutex);
   if (result) {

@@ -43,7 +43,9 @@ static vector<string> get_sysfs_info(const string& device_path);
 static string read_line(const string& file);
 static string usb_sysfs_hw_string(const string& sysfs_path);
 static string format(const char* format, ...);
-
+/**
+*******************************************************************************
+*/
 vector<string>
 glob(const vector<string>& patterns)
 {
@@ -72,7 +74,9 @@ glob(const vector<string>& patterns)
 
     return paths_found;
 }
-
+/**
+*******************************************************************************
+*/
 string
 basename(const string& path)
 {
@@ -83,7 +87,9 @@ basename(const string& path)
 
     return string(path, pos+1, string::npos);
 }
-
+/**
+*******************************************************************************
+*/
 string
 dirname(const string& path)
 {
@@ -96,7 +102,9 @@ dirname(const string& path)
 
     return string(path, 0, pos);
 }
-
+/**
+*******************************************************************************
+*/
 bool
 path_exists(const string& path)
 {
@@ -107,7 +115,9 @@ path_exists(const string& path)
 
     return false;
 }
-
+/**
+*******************************************************************************
+*/
 string
 realpath(const string& path)
 {
@@ -124,7 +134,9 @@ realpath(const string& path)
 
     return result;
 }
-
+/**
+*******************************************************************************
+*/
 string
 usb_sysfs_friendly_name(const string& sys_usb_path)
 {
@@ -143,7 +155,9 @@ usb_sysfs_friendly_name(const string& sys_usb_path)
 
     return format("%s %s %s", manufacturer.c_str(), product.c_str(), serial.c_str() );
 }
-
+/**
+*******************************************************************************
+*/
 vector<string>
 get_sysfs_info(const string& device_path)
 {
@@ -199,7 +213,9 @@ get_sysfs_info(const string& device_path)
 
     return result;
 }
-
+/**
+*******************************************************************************
+*/
 string
 read_line(const string& file)
 {
@@ -214,7 +230,9 @@ read_line(const string& file)
 
     return line;
 }
-
+/**
+*******************************************************************************
+*/
 string
 format(const char* format, ...)
 {
@@ -276,7 +294,9 @@ format(const char* format, ...)
 
     return result;
 }
-
+/**
+*******************************************************************************
+*/
 string
 usb_sysfs_hw_string(const string& sysfs_path)
 {
@@ -293,7 +313,9 @@ usb_sysfs_hw_string(const string& sysfs_path)
 
     return format("USB VID:PID=%s:%s %s", vid.c_str(), pid.c_str(), serial_number.c_str() );
 }
-
+/**
+*******************************************************************************
+*/
 vector<PortInfo>
 serial::list_ports()
 {

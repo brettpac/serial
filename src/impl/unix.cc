@@ -55,8 +55,8 @@ using serial::SerialException;
 using serial::PortNotOpenedException;
 using serial::IOException;
 
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 MillisecondTimer::MillisecondTimer (const uint32_t millis)
   : expiry(timespec_now())
@@ -70,8 +70,8 @@ MillisecondTimer::MillisecondTimer (const uint32_t millis)
     expiry.tv_nsec = tv_nsec;
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 int64_t 
 MillisecondTimer::remaining ()
@@ -81,8 +81,8 @@ MillisecondTimer::remaining ()
   millis += (expiry.tv_nsec - now.tv_nsec) / 1e6;
   return millis;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 timespec
 MillisecondTimer::timespec_now ()
@@ -101,8 +101,8 @@ MillisecondTimer::timespec_now ()
 # endif
   return time;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 timespec
 timespec_from_ms (const uint32_t millis)
@@ -112,8 +112,8 @@ timespec_from_ms (const uint32_t millis)
   time.tv_nsec = (millis - (time.tv_sec * 1e3)) * 1e6;
   return time;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 Serial::SerialImpl::SerialImpl (const string &port, unsigned long baudrate,
                                 bytesize_t bytesize,
@@ -128,8 +128,8 @@ Serial::SerialImpl::SerialImpl (const string &port, unsigned long baudrate,
   if (port_.empty () == false)
     open ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 Serial::SerialImpl::~SerialImpl ()
 {
@@ -137,8 +137,8 @@ Serial::SerialImpl::~SerialImpl ()
   pthread_mutex_destroy(&this->read_mutex);
   pthread_mutex_destroy(&this->write_mutex);
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::open ()
 {
@@ -170,8 +170,8 @@ void Serial::SerialImpl::open ()
   reconfigurePort();
   is_open_ = true;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
  void Serial::SerialImpl::reconfigurePort ()
 {
@@ -463,8 +463,8 @@ void Serial::SerialImpl::open ()
     byte_time_ns_ += ((1.5 - stopbits_one_point_five) * bit_time_ns);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::close ()
 {
@@ -481,16 +481,16 @@ void Serial::SerialImpl::close ()
     is_open_ = false;
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool Serial::SerialImpl::isOpen () const
 {
   return is_open_;
 }
-   /*
-    *****************************************************************************  
-    */
+/**
+*******************************************************************************
+*/
 size_t
 Serial::SerialImpl::available ()
 {
@@ -504,8 +504,8 @@ Serial::SerialImpl::available ()
       return static_cast<size_t> (count);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool Serial::SerialImpl::waitReadable (uint32_t timeout)
 {
@@ -536,16 +536,16 @@ bool Serial::SerialImpl::waitReadable (uint32_t timeout)
   // Data available to read.
   return true;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::waitByteTimes (size_t count)
 {
   timespec wait_time = { 0, static_cast<long>(byte_time_ns_ * count)};
   pselect (0, NULL, NULL, NULL, &wait_time, NULL);
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 size_t
 Serial::SerialImpl::read (uint8_t *buf, size_t size)
@@ -623,8 +623,8 @@ Serial::SerialImpl::read (uint8_t *buf, size_t size)
   }
   return bytes_read;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 size_t
 Serial::SerialImpl::write (const uint8_t *data, size_t length)
@@ -708,38 +708,38 @@ Serial::SerialImpl::write (const uint8_t *data, size_t length)
   }
   return bytes_written;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setPort (const string &port)
 {
   port_ = port;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 string
 Serial::SerialImpl::getPort () const
 {
   return port_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setTimeout (serial::Timeout &timeout)
 {
   timeout_ = timeout;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 serial::Timeout
 Serial::SerialImpl::getTimeout () const
 {
   return timeout_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setBaudrate (unsigned long baudrate)
 {
@@ -747,16 +747,16 @@ void Serial::SerialImpl::setBaudrate (unsigned long baudrate)
   if (is_open_)
     reconfigurePort ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 unsigned long
 Serial::SerialImpl::getBaudrate () const
 {
   return baudrate_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setBytesize (serial::bytesize_t bytesize)
 {
@@ -764,16 +764,16 @@ void Serial::SerialImpl::setBytesize (serial::bytesize_t bytesize)
   if (is_open_)
     reconfigurePort ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 serial::bytesize_t
 Serial::SerialImpl::getBytesize () const
 {
   return bytesize_;
 }
- /*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setParity (serial::parity_t parity)
 {
@@ -781,16 +781,16 @@ void Serial::SerialImpl::setParity (serial::parity_t parity)
   if (is_open_)
     reconfigurePort ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 serial::parity_t
 Serial::SerialImpl::getParity () const
 {
   return parity_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setStopbits (serial::stopbits_t stopbits)
 {
@@ -798,16 +798,16 @@ void Serial::SerialImpl::setStopbits (serial::stopbits_t stopbits)
   if (is_open_)
     reconfigurePort ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 serial::stopbits_t
 Serial::SerialImpl::getStopbits () const
 {
   return stopbits_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setFlowcontrol (serial::flowcontrol_t flowcontrol)
 {
@@ -815,16 +815,16 @@ void Serial::SerialImpl::setFlowcontrol (serial::flowcontrol_t flowcontrol)
   if (is_open_)
     reconfigurePort ();
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 serial::flowcontrol_t
 Serial::SerialImpl::getFlowcontrol () const
 {
   return flowcontrol_;
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::flush ()
 {
@@ -833,8 +833,8 @@ void Serial::SerialImpl::flush ()
   }
   tcdrain (fd_);
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::flushInput ()
 {
@@ -843,8 +843,8 @@ void Serial::SerialImpl::flushInput ()
   }
   tcflush (fd_, TCIFLUSH);
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::flushOutput ()
 {
@@ -853,8 +853,8 @@ void Serial::SerialImpl::flushOutput ()
   }
   tcflush (fd_, TCOFLUSH);
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::sendBreak (int duration)
 {
@@ -863,8 +863,8 @@ void Serial::SerialImpl::sendBreak (int duration)
   }
   tcsendbreak (fd_, static_cast<int> (duration / 4));
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setBreak (bool level)
 {
@@ -888,8 +888,8 @@ void Serial::SerialImpl::setBreak (bool level)
     }
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setRTS (bool level)
 {
@@ -915,8 +915,8 @@ void Serial::SerialImpl::setRTS (bool level)
     }
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::setDTR (bool level)
 {
@@ -942,8 +942,8 @@ void Serial::SerialImpl::setDTR (bool level)
     }
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool
 Serial::SerialImpl::waitForChange ()
@@ -987,8 +987,8 @@ while (is_open_ == true) {
   return true;
 #endif
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool
 Serial::SerialImpl::getCTS ()
@@ -1010,8 +1010,8 @@ Serial::SerialImpl::getCTS ()
     return 0 != (status & TIOCM_CTS);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool
 Serial::SerialImpl::getDSR ()
@@ -1033,8 +1033,8 @@ Serial::SerialImpl::getDSR ()
       return 0 != (status & TIOCM_DSR);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool
 Serial::SerialImpl::getRI ()
@@ -1056,8 +1056,8 @@ Serial::SerialImpl::getRI ()
     return 0 != (status & TIOCM_RI);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 bool
 Serial::SerialImpl::getCD ()
@@ -1079,8 +1079,8 @@ Serial::SerialImpl::getCD ()
     return 0 != (status & TIOCM_CD);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::readLock ()
 {
@@ -1089,8 +1089,8 @@ void Serial::SerialImpl::readLock ()
     THROW (IOException, result);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::readUnlock ()
 {
@@ -1099,8 +1099,8 @@ void Serial::SerialImpl::readUnlock ()
     THROW (IOException, result);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::writeLock ()
 {
@@ -1109,8 +1109,8 @@ void Serial::SerialImpl::writeLock ()
     THROW (IOException, result);
   }
 }
-/*
-*****************************************************************************  
+/**
+*******************************************************************************
 */
 void Serial::SerialImpl::writeUnlock ()
 {

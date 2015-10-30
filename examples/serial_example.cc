@@ -35,7 +35,9 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
-
+/**
+*******************************************************************************
+*/
 void my_sleep(unsigned long milliseconds) {
 #ifdef _WIN32
       Sleep(milliseconds); // 100 ms
@@ -43,7 +45,9 @@ void my_sleep(unsigned long milliseconds) {
       usleep(milliseconds*1000); // 100 ms
 #endif
 }
-
+/**
+*******************************************************************************
+*/
 void enumerate_ports()
 {
 	vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -58,13 +62,17 @@ void enumerate_ports()
      device.hardware_id.c_str() );
 	}
 }
-
+/**
+*******************************************************************************
+*/
 void print_usage()
 {
 	cerr << "Usage: test_serial {-e|<serial port address>} ";
     cerr << "<baudrate> [test string]" << endl;
 }
-
+/**
+*******************************************************************************
+*/
 int run(int argc, char **argv)
 {
   if(argc < 2) {
@@ -172,7 +180,9 @@ int run(int argc, char **argv)
 
   return 0;
 }
-
+/**
+*******************************************************************************
+*/
 int main(int argc, char **argv) {
   try {
     return run(argc, argv);

@@ -257,7 +257,6 @@ public:
 
   /** ************************************************************************* 
    *  Read a given amount of bytes from the serial port into a given buffer.
-   */
    *
    * The read function will return in one of three cases:
    *  * The number of requested bytes was read.

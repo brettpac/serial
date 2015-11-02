@@ -51,7 +51,9 @@ __LINE__, (message) )
 namespace serial {
 
 /*!
+ *******************************************************************************
  * Enumeration defines the possible bytesizes for the serial port.
+ *******************************************************************************
  */
 typedef enum {
   fivebits = 5,
@@ -61,7 +63,9 @@ typedef enum {
 } bytesize_t;
 
 /*!
+ *******************************************************************************
  * Enumeration defines the possible parity types for the serial port.
+  *******************************************************************************
  */
 typedef enum {
   parity_none = 0,
@@ -72,7 +76,9 @@ typedef enum {
 } parity_t;
 
 /*!
+ *******************************************************************************
  * Enumeration defines the possible stopbit types for the serial port.
+  *******************************************************************************
  */
 typedef enum {
   stopbits_one = 1,
@@ -81,7 +87,9 @@ typedef enum {
 } stopbits_t;
 
 /*!
+ *******************************************************************************
  * Enumeration defines the possible flowcontrol types for the serial port.
+  *******************************************************************************
  */
 typedef enum {
   flowcontrol_none = 0,
@@ -90,10 +98,12 @@ typedef enum {
 } flowcontrol_t;
 
 /*!
+ *******************************************************************************
  * Structure for setting the timeout of the serial port, times are
  * in milliseconds.
  *
  * In order to disable the interbyte timeout, set it to Timeout::max().
+  *******************************************************************************
  */
 struct Timeout {
 #ifdef max
@@ -101,6 +111,7 @@ struct Timeout {
 #endif
   static uint32_t max() {return std::numeric_limits<uint32_t>::max();}
   /*!
+   ****************************************************************************
    * Convenience function to generate Timeout structs using a
    * single absolute timeout.
    *
@@ -108,6 +119,7 @@ struct Timeout {
    * timeout occurs after a call to read or write is made.
    *
    * \return Timeout struct that represents this simple timeout provided.
+    ***************************************************************************
    */
   static Timeout simpleTimeout(uint32_t timeout) {
     return Timeout(max(), timeout, 0, timeout, 0);
@@ -142,7 +154,9 @@ struct Timeout {
 };
 
 /*!
+ *******************************************************************************
  * Class that provides a portable serial port interface.
+  *******************************************************************************
  */
 class Serial {
 public:
@@ -189,6 +203,7 @@ public:
   virtual ~Serial ();
 
   /*!
+   ****************************************************************************
    * Opens the serial port as long as the port is set and the port isn't
    * already open.
    *
@@ -204,9 +219,11 @@ public:
   void
   open ();
 
-  /*! Gets the open status of the serial port.
-   *
+  /**
+   ****************************************************************************
+   *! Gets the open status of the serial port.
    * \return Returns true if the port is open, false otherwise.
+   ****************************************************************************
    */
   bool
   isOpen () const;
@@ -215,25 +232,32 @@ public:
   void
   close ();
 
-  /*! Return the number of characters in the buffer. */
+  /** *************************************************************************
+  * Return the number of characters in the buffer. -BOOKMARK 
+  */
   size_t
   available ();
 
-  /*! Block until there is serial data to read or read_timeout_constant
+  /** *************************************************************************
+  ! Block until there is serial data to read or read_timeout_constant
    * number of milliseconds have elapsed. The return value is true when
    * the function exits with the port in a readable state, false otherwise
    * (due to timeout or select interruption). */
   bool
   waitReadable ();
 
-  /*! Block for a period of time corresponding to the transmission time of
+  /**  *************************************************************************
+   * Block for a period of time corresponding to the transmission time of
    * count characters at present serial settings. This may be used in con-
    * junction with waitReadable to read larger blocks of data from the
-   * port. */
+   * port. 
+   */
   void
   waitByteTimes (size_t count);
 
-  /*! Read a given amount of bytes from the serial port into a given buffer.
+  /** ************************************************************************* 
+   *  Read a given amount of bytes from the serial port into a given buffer.
+   */
    *
    * The read function will return in one of three cases:
    *  * The number of requested bytes was read.
@@ -264,7 +288,9 @@ public:
   size_t
   read (uint8_t *buffer, size_t size);
 
-  /*! Read a given amount of bytes from the serial port into a give buffer.
+  /**  *************************************************************************
+   *   Read a given amount of bytes from the serial port into a give buffer.
+   *
    *
    * \param buffer A reference to a std::vector of uint8_t.
    * \param size A size_t defining how many bytes to be read.
@@ -278,7 +304,9 @@ public:
   size_t
   read (std::vector<uint8_t> &buffer, size_t size = 1);
 
-  /*! Read a given amount of bytes from the serial port into a give buffer.
+  /**  *************************************************************************
+   *  ! Read a given amount of bytes from the serial port into a give buffer.
+   *
    *
    * \param buffer A reference to a std::string.
    * \param size A size_t defining how many bytes to be read.
@@ -292,7 +320,9 @@ public:
   size_t
   read (std::string &buffer, size_t size = 1);
 
-  /*! Read a given amount of bytes from the serial port and return a string
+  /** ************************************************************************* 
+   *  Read a given amount of bytes from the serial port and return a string
+   *
    *  containing the data.
    *
    * \param size A size_t defining how many bytes to be read.
@@ -305,7 +335,8 @@ public:
   std::string
   read (size_t size = 1);
 
-  /*! Reads in a line or until a given delimiter has been processed.
+  /** *************************************************************************
+   * Reads in a line or until a given delimiter has been processed.
    *
    * Reads from the serial port until a single line has been read.
    *
@@ -321,7 +352,8 @@ public:
   size_t
   readline (std::string &buffer, size_t size = 65536, std::string eol = "\n");
 
-  /*! Reads in a line or until a given delimiter has been processed.
+  /**  *************************************************************************
+   *  Reads in a line or until a given delimiter has been processed.
    *
    * Reads from the serial port until a single line has been read.
    *
@@ -336,7 +368,8 @@ public:
   std::string
   readline (size_t size = 65536, std::string eol = "\n");
 
-  /*! Reads in multiple lines until the serial port times out.
+  /**  ************************************************************************* 
+   *  Reads in multiple lines until the serial port times out.
    *
    * This requires a timeout > 0 before it can be run. It will read until a
    * timeout occurs and return a list of strings.
@@ -353,7 +386,9 @@ public:
   std::vector<std::string>
   readlines (size_t size = 65536, std::string eol = "\n");
 
-  /*! Write a string to the serial port.
+  /**  *************************************************************************
+   *    Write a string to the serial port.
+   *
    *
    * \param data A const reference containing the data to be written
    * to the serial port.
@@ -371,7 +406,9 @@ public:
   size_t
   write (const uint8_t *data, size_t size);
 
-  /*! Write a string to the serial port.
+  /**  *************************************************************************
+   * Write a string to the serial port.
+   *
    *
    * \param data A const reference containing the data to be written
    * to the serial port.
@@ -386,7 +423,9 @@ public:
   size_t
   write (const std::vector<uint8_t> &data);
 
-  /*! Write a string to the serial port.
+  /**  *************************************************************************
+   * Write a string to the serial port.
+   *
    *
    * \param data A const reference containing the data to be written
    * to the serial port.
@@ -401,7 +440,9 @@ public:
   size_t
   write (const std::string &data);
 
-  /*! Sets the serial port identifier.
+  /**  *************************************************************************
+   *    Sets the serial port identifier.
+   *
    *
    * \param port A const std::string reference containing the address of the
    * serial port, which would be something like 'COM1' on Windows and
@@ -412,7 +453,9 @@ public:
   void
   setPort (const std::string &port);
 
-  /*! Gets the serial port identifier.
+  /** *************************************************************************
+   *    Gets the serial port identifier.
+   *
    *
    * \see Serial::setPort
    *
@@ -421,7 +464,9 @@ public:
   std::string
   getPort () const;
 
-  /*! Sets the timeout for reads and writes using the Timeout struct.
+  /** *************************************************************************
+   *    Sets the timeout for reads and writes using the Timeout struct.
+   *
    *
    * There are two timeout conditions described here:
    *  * The inter byte timeout:
@@ -458,7 +503,9 @@ public:
   void
   setTimeout (Timeout &timeout);
 
-  /*! Sets the timeout for reads and writes. */
+  /**  *************************************************************************
+   *  Sets the timeout for reads and writes.
+   */
   void
   setTimeout (uint32_t inter_byte_timeout, uint32_t read_timeout_constant,
               uint32_t read_timeout_multiplier, uint32_t write_timeout_constant,
@@ -470,7 +517,9 @@ public:
     return setTimeout(timeout);
   }
 
-  /*! Gets the timeout for reads in seconds.
+  /** *************************************************************************
+   *    Gets the timeout for reads in seconds.
+   *
    *
    * \return A Timeout struct containing the inter_byte_timeout, and read
    * and write timeout constants and multipliers.
@@ -480,7 +529,9 @@ public:
   Timeout
   getTimeout () const;
 
-  /*! Sets the baudrate for the serial port.
+  /** *************************************************************************
+   *  Sets the baudrate for the serial port.
+   *
    *
    * Possible baudrates depends on the system but some safe baudrates include:
    * 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 56000,
@@ -584,18 +635,31 @@ public:
   flowcontrol_t
   getFlowcontrol () const;
 
-  /*! Flush the input and output buffers */
+  /** *************************************************************************
+   * FLUSH - BOOKMARK  
+   *   *************************************************************************
+   */
+  /**  *************************************************************************
+   *  ! Flush the input and output buffers */
   void
   flush ();
 
-  /*! Flush only the input buffer */
+  /** ************************************************************************* 
+   *  Flush only the input buffer 
+   */
   void
   flushInput ();
 
-  /*! Flush only the output buffer */
+  /** *************************************************************************
+   *    Flush only the output buffer 
+   */
   void
   flushOutput ();
-
+/*****************************************************************************
+ *  
+ *  
+ *  
+ */
   /*! Sends the RS-232 break signal.  See tcsendbreak(3). */
   void
   sendBreak (int duration);
@@ -666,7 +730,9 @@ private:
   write_ (const uint8_t *data, size_t length);
 
 };
-
+/**
+*******************************************************************************
+*/
 class SerialException : public std::exception
 {
   // Disable copy constructors
@@ -684,7 +750,9 @@ public:
     return e_what_.c_str();
   }
 };
-
+/**
+*******************************************************************************
+*/
 class IOException : public std::exception
 {
   // Disable copy constructors
@@ -723,7 +791,9 @@ public:
     return e_what_.c_str();
   }
 };
-
+/**
+*******************************************************************************
+*/
 class PortNotOpenedException : public std::exception
 {
   // Disable copy constructors
@@ -743,7 +813,9 @@ public:
 };
 
 /*!
+ *******************************************************************************
  * Structure that describes a serial device.
+  *******************************************************************************
  */
 struct PortInfo {
 
